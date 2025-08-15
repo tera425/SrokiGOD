@@ -55,12 +55,58 @@ function mixColors(colorA, colorB, t) {
 }
 
 function parseColor(c) {
-	const ctx2 = document.createElement('canvas').getContext('2d');
-	ctx2.fillStyle = c;
-	const computed = ctx2.fillStyle;
-	const m = computed.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d\.]+))?\)/);
-	if (!m) return { r: 255, g: 255, b: 255, a: 1 };
-	return { r: +m[1], g: +m[2], b: +m[3], a: m[4] ? +m[4] : 1 };
+	if (!c) return { r: 255, g: 255, b: 255, a: 1 };
+	c = c.trim();
+
+	// rgb/rgba
+	let m = c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d\.]+))?\)/i);
+	if (m) {
+		return { r: +m[1], g: +m[2], b: +m[3], a: m[4] ? +m[4] : 1 };
+	}
+
+	// hex: #rgb, #rgba, #rrggbb, #rrggbbaa
+	let hex = c.replace(/^#/, '');
+	if (/^[0-9a-f]{3,8}$/i.test(hex)) {
+		if (hex.length === 3) {
+			const r = parseInt(hex[0] + hex[0], 16);
+			const g = parseInt(hex[1] + hex[1], 16);
+			const b = parseInt(hex[2] + hex[2], 16);
+			return { r, g, b, a: 1 };
+		}
+		if (hex.length === 4) {
+			const r = parseInt(hex[0] + hex[0], 16);
+			const g = parseInt(hex[1] + hex[1], 16);
+			const b = parseInt(hex[2] + hex[2], 16);
+			const a = parseInt(hex[3] + hex[3], 16) / 255;
+			return { r, g, b, a };
+		}
+		if (hex.length === 6) {
+			const r = parseInt(hex.slice(0,2), 16);
+			const g = parseInt(hex.slice(2,4), 16);
+			const b = parseInt(hex.slice(4,6), 16);
+			return { r, g, b, a: 1 };
+		}
+		if (hex.length === 8) {
+			const r = parseInt(hex.slice(0,2), 16);
+			const g = parseInt(hex.slice(2,4), 16);
+			const b = parseInt(hex.slice(4,6), 16);
+			const a = parseInt(hex.slice(6,8), 16) / 255;
+			return { r, g, b, a };
+		}
+	}
+
+	// fallback via DOM computed style (handles named colors etc.)
+	const probe = document.createElement('div');
+	probe.style.color = c;
+	document.body.appendChild(probe);
+	const cs = getComputedStyle(probe).color;
+	document.body.removeChild(probe);
+	const mm = cs.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d\.]+))?\)/i);
+	if (mm) {
+		return { r: +mm[1], g: +mm[2], b: +mm[3], a: mm[4] ? +mm[4] : 1 };
+	}
+
+	return { r: 255, g: 255, b: 255, a: 1 };
 }
 
 const state = {
@@ -220,7 +266,8 @@ function draw(timestamp, prevTimestamp) {
 	ctx.translate(cx, cy);
 	for (let i = 0; i < 6; i++) {
 		ctx.beginPath();
-		ctx.strokeStyle = rgbaStr(...Object.values(parseColor(ringColor)).slice(0,3), 0.06);
+		ctx.globalAlpha = 0.08;
+		ctx.strokeStyle = ringColor;
 		ctx.lineWidth = 18 + i * 6;
 		ctx.arc(0, 0, radius, 0, TWO_PI);
 		ctx.stroke();
