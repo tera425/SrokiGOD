@@ -76,3 +76,33 @@ body {
 #ui button:hover {
   filter: brightness(0.95);
 }
+
+#ui .bottom {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 8px 12px;
+  border-radius: 10px;
+  backdrop-filter: blur(6px);
+  pointer-events: auto;
+}
+
+#ui .bottom input[type="number"] {
+  width: 130px;
+  padding: 8px 10px;
+  background: rgba(4, 7, 10, 0.8);
+  color: #e8eef6;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  outline: none;
+}
+
+#ui .bottom input[type="number"]::placeholder {
+  color: #93a4b5;
+}
