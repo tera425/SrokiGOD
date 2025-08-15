@@ -132,3 +132,42 @@ body {
 .dot.inhale { background: var(--accent-inhale); }
 .dot.hold { background: var(--accent-hold); }
 .dot.exhale { background: var(--accent-exhale); }
+
+/* Donation */
+.donate {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px 14px;
+	margin-top: 10px;
+}
+
+.field {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	color: var(--muted);
+	font-size: 14px;
+}
+
+.amount {
+	position: relative;
+}
+
+.amount input[type="number"] {
+	width: 120px;
+	padding: 6px 28px 6px 10px;
+	border-radius: 8px;
+	border: 1px solid #2a2f49;
+	background: #11162d;
+	color: var(--text);
+}
+
+.currency {
+	position: absolute;
+	right: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	opacity: 0.7;
+	pointer-events: none;
+}
