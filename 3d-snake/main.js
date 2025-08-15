@@ -89,13 +89,17 @@
       try {
         donateBtn.disabled = true;
         donateBtn.textContent = 'Отправка...';
-        const res = await fetch('/donate', {
+        const res = await fetch('http://localhost:8787/api/create-payment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ amount })
         });
         const data = await res.json().catch(() => ({ ok: false }));
-        if (res.ok && data && data.ok) {
+        if (res.ok && data) {
+          const redirectUrl = data.checkoutUrl || data.url || data.payment_url || data.redirect_url;
+          if (redirectUrl && typeof redirectUrl === 'string') {
+            window.open(redirectUrl, '_blank', 'noopener');
+          }
           donateBtn.textContent = 'Спасибо!';
           donationAmountInput.value = '';
         } else {
