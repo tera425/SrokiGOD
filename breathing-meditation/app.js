@@ -5,6 +5,8 @@ const cycleSecondsInput = document.getElementById('cycleSeconds');
 const holdSecondsInput = document.getElementById('holdSeconds');
 const sizeInput = document.getElementById('size');
 const toggleBtn = document.getElementById('toggleBtn');
+const donateAmountInput = document.getElementById('donateAmount');
+const donateBtn = document.getElementById('donateBtn');
 
 let running = false;
 
@@ -27,6 +29,10 @@ const palette = {
 	hold: getCssVar('--accent-hold', '#a78bfa'),
 	exhale: getCssVar('--accent-exhale', '#ff7c93'),
 };
+
+const YOOMONEY_RECEIVER = '4100XXXXXXXXXXXXX';
+const YOOMONEY_TARGETS = 'Поддержать медитацию дыхания';
+const YOOMONEY_LABEL = 'breathing-meditation';
 
 function getCssVar(name, fallback) {
 	const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -107,6 +113,18 @@ function parseColor(c) {
 	}
 
 	return { r: 255, g: 255, b: 255, a: 1 };
+}
+
+function buildYooMoneyUrl(sum) {
+	const params = new URLSearchParams({
+		receiver: YOOMONEY_RECEIVER,
+		'quickpay-form': 'donate',
+		sum: String(sum),
+		targets: YOOMONEY_TARGETS,
+		label: YOOMONEY_LABEL,
+		successURL: location.origin
+	});
+	return `https://yoomoney.ru/quickpay/confirm.xml?${params.toString()}`;
 }
 
 const state = {
@@ -348,3 +366,11 @@ window.addEventListener('keydown', (e) => {
 		running ? stop() : start();
 	}
 });
+
+if (donateBtn) {
+	donateBtn.addEventListener('click', () => {
+		const amount = Math.max(10, Math.round(+donateAmountInput.value || 0));
+		const url = buildYooMoneyUrl(amount);
+		window.open(url, '_blank', 'noopener,noreferrer');
+	});
+}
