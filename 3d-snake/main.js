@@ -75,6 +75,47 @@
   foodMesh.position.y = 0.5;
   scene.add(foodMesh);
 
+  const donateBtn = document.getElementById('donateBtn');
+  const donationAmountInput = document.getElementById('donationAmount');
+  if (donateBtn && donationAmountInput) {
+    donateBtn.addEventListener('click', async () => {
+      const raw = donationAmountInput.value.trim();
+      const amount = Number(raw);
+      if (!raw || !isFinite(amount) || amount <= 0) {
+        donateBtn.textContent = 'Введите сумму';
+        setTimeout(() => (donateBtn.textContent = 'Пожертвовать'), 1200);
+        return;
+      }
+      try {
+        donateBtn.disabled = true;
+        donateBtn.textContent = 'Отправка...';
+        const res = await fetch('http://localhost:8787/api/create-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount })
+        });
+        const data = await res.json().catch(() => ({ ok: false }));
+        if (res.ok && data) {
+          const redirectUrl = data.checkoutUrl || data.url || data.payment_url || data.redirect_url;
+          if (redirectUrl && typeof redirectUrl === 'string') {
+            window.open(redirectUrl, '_blank', 'noopener');
+          }
+          donateBtn.textContent = 'Спасибо!';
+          donationAmountInput.value = '';
+        } else {
+          donateBtn.textContent = 'Ошибка';
+        }
+      } catch (e) {
+        donateBtn.textContent = 'Сбой сети';
+      } finally {
+        setTimeout(() => {
+          donateBtn.textContent = 'Пожертвовать';
+          donateBtn.disabled = false;
+        }, 1200);
+      }
+    });
+  }
+
   let gameState = 'ready';
   let direction = { x: 1, z: 0 };
   let nextDirection = { x: 1, z: 0 };
