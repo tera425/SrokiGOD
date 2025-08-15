@@ -33,6 +33,7 @@ const palette = {
 const YOOMONEY_RECEIVER = '4100XXXXXXXXXXXXX';
 const YOOMONEY_TARGETS = 'Поддержать медитацию дыхания';
 const YOOMONEY_LABEL = 'breathing-meditation';
+const API_URL = 'http://localhost:8787/api/create-payment';
 
 function getCssVar(name, fallback) {
 	const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -368,9 +369,26 @@ window.addEventListener('keydown', (e) => {
 });
 
 if (donateBtn) {
-	donateBtn.addEventListener('click', () => {
+	donateBtn.addEventListener('click', async () => {
 		const amount = Math.max(10, Math.round(+donateAmountInput.value || 0));
-		const url = buildYooMoneyUrl(amount);
-		window.open(url, '_blank', 'noopener,noreferrer');
+		donateBtn.disabled = true;
+		try {
+			const res = await fetch(API_URL, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ amount })
+			});
+			const data = await res.json();
+			if (!res.ok) throw new Error(data && (data.error || data.details || 'Ошибка запроса'));
+			if (data && data.confirmation_url) {
+				window.location.href = data.confirmation_url;
+			} else {
+				throw new Error('Не получена ссылка на оплату');
+			}
+		} catch (e) {
+			alert('Не удалось создать платеж через ЮKassa: ' + e.message);
+		} finally {
+			donateBtn.disabled = false;
+		}
 	});
 }
