@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Медитация дыхания</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+	<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+	<div id="app">
+		<header class="header">
+			<h1 class="title">Медитация дыхания</h1>
+			<div class="controls">
+				<label class="control">
+					<span>Цикл (сек):</span>
+					<input id="cycleSeconds" type="number" min="4" max="60" step="1" value="8" />
+				</label>
+				<label class="control">
+					<span>Задержка (сек):</span>
+					<input id="holdSeconds" type="number" min="0" max="30" step="1" value="2" />
+				</label>
+				<label class="control">
+					<span>Размер</span>
+					<input id="size" type="range" min="120" max="480" value="320" />
+				</label>
+				<button id="toggleBtn" class="btn">Старт</button>
+			</div>
+		</header>
+
+		<main class="stage">
+			<canvas id="canvas" width="800" height="800" aria-label="Дыхательный круг" role="img"></canvas>
+			<div id="cue" class="cue">Готовьтесь</div>
+		</main>
+
+		<footer class="footer">
+			<div class="legend">
+				<span class="dot inhale"></span> Вдох
+				<span class="dot hold"></span> Задержка
+				<span class="dot exhale"></span> Выдох
+			</div>
+		</footer>
+	</div>
+
+	<script src="app.js"></script>
+</body>
+</html>
