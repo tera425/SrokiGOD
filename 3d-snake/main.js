@@ -85,6 +85,7 @@
   let stepIntervalMs = STEP_INTERVAL_MS_BASE / SPEED_MULTIPLIER_LEVELS[speedLevel];
   let accumulatorMs = 0;
   let lastTime = performance.now();
+  let directionChangeLocked = false;
 
   function gridToWorld(n) {
     return (n - (GRID_SIZE - 1) / 2) * CELL_SIZE;
@@ -150,6 +151,8 @@
     score = 0;
     speedLevel = 0;
     stepIntervalMs = STEP_INTERVAL_MS_BASE / SPEED_MULTIPLIER_LEVELS[speedLevel];
+    accumulatorMs = 0;
+    directionChangeLocked = false;
     updateScoreUI();
     updateSpeedUI();
     rebuildSnakeMeshes();
@@ -213,8 +216,10 @@
 
   function handleInputDirectionChange(dir) {
     if (gameState !== 'playing') return;
+    if (directionChangeLocked) return;
     if (snake.length > 1 && isOpposite(dir, direction)) return;
     nextDirection = dir;
+    directionChangeLocked = true;
   }
 
   window.addEventListener('keydown', (e) => {
@@ -290,6 +295,7 @@
     }
 
     rebuildSnakeMeshes();
+    directionChangeLocked = false;
   }
 
   function animate(time) {
