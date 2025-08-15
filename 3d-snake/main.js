@@ -96,7 +96,7 @@
         });
         const data = await res.json().catch(() => ({ ok: false }));
         if (res.ok && data) {
-          const redirectUrl = data.checkoutUrl || data.url || data.payment_url || data.redirect_url;
+          const redirectUrl = data.confirmation_url || data.checkoutUrl || data.url || data.payment_url || data.redirect_url;
           if (redirectUrl && typeof redirectUrl === 'string') {
             window.open(redirectUrl, '_blank', 'noopener');
           }
