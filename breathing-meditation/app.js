@@ -239,23 +239,35 @@ function draw(timestamp, prevTimestamp) {
 	const minR = Math.min(w, h) * 0.18;
 	const maxR = Math.max(minR + 10, state.baseSize / 2);
 
-	let inhaleT = 0, exhaleT = 0;
-	if (state.phase === 'inhale' || state.phase === 'hold1') {
-		const t = clamp(state.phaseTime / state.phaseDurationsMs.inhale, 0, 1);
-		inhaleT = easeInOut(t);
-		exhaleT = 0;
-	}
-	if (state.phase === 'exhale' || state.phase === 'hold2') {
-		const t = clamp(state.phaseTime / state.phaseDurationsMs.exhale, 0, 1);
-		exhaleT = easeInOut(t);
-		inhaleT = 1;
+	let factor = 0;
+	switch (state.phase) {
+		case 'inhale': {
+			const t = clamp(state.phaseTime / state.phaseDurationsMs.inhale, 0, 1);
+			factor = easeInOut(t);
+			break;
+		}
+		case 'hold1': {
+			factor = 1; // freeze at max after inhale
+			break;
+		}
+		case 'exhale': {
+			const t = clamp(state.phaseTime / state.phaseDurationsMs.exhale, 0, 1);
+			factor = 1 - easeInOut(t);
+			break;
+		}
+		case 'hold2': {
+			factor = 0; // freeze at min after exhale
+			break;
+		}
+		default: factor = 0;
 	}
 
-	const radius = lerp(minR, maxR, clamp(inhaleT - exhaleT, 0, 1));
+	const radius = lerp(minR, maxR, factor);
 	state.radius = radius;
 
 	const color = phaseColor();
-	const glow = 0.5 + 0.5 * Math.sin(timestamp * 0.003);
+	const isHolding = state.phase === 'hold1' || state.phase === 'hold2';
+	const glow = isHolding ? 0.5 : 0.5 + 0.5 * Math.sin(timestamp * 0.003);
 	const ringColor = mixColors(color, '#ffffff', glow * 0.25);
 
 	// background subtle grid
@@ -280,8 +292,12 @@ function draw(timestamp, prevTimestamp) {
 	ctx.arc(cx, cy, radius * 0.86, 0, TWO_PI);
 	ctx.fill();
 
-	spawnParticles(cx, cy, radius, ringColor);
-	updateParticles(dt);
+	if (!isHolding) {
+		spawnParticles(cx, cy, radius, ringColor);
+	}
+	if (!isHolding) {
+		updateParticles(dt);
+	}
 	drawParticles();
 
 	cueEl.textContent = currentCue();
