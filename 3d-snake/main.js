@@ -139,7 +139,7 @@
     cellsOccupied.clear();
     const startX = Math.floor(GRID_SIZE / 2) - 2;
     const startZ = Math.floor(GRID_SIZE / 2);
-    for (let i = 0; i < 4; i++) {
+    for (let i = 3; i >= 0; i--) {
       const x = startX + i;
       const z = startZ;
       snake.push({ x, z });
